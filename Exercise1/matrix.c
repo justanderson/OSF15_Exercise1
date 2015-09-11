@@ -1,7 +1,14 @@
+/*
+* Exercise 1
+* Justin Anderson
+* 14136222
+* 11 Sep 15
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 #include <fcntl.h>
 #include <sys/types.h>
@@ -33,7 +40,9 @@ void load_matrix (Matrix_t* m, unsigned int* data);
 bool create_matrix (Matrix_t** new_matrix, const char* name, const unsigned int rows,
 						const unsigned int cols) {
 
-	//TODO ERROR CHECK INCOMING PARAMETERS
+	if(!name || (rows < 0) || (cols < 0)) {
+		return false;
+	}
 
 	*new_matrix = calloc(1,sizeof(Matrix_t));
 	if (!(*new_matrix)) {
@@ -54,11 +63,18 @@ bool create_matrix (Matrix_t** new_matrix, const char* name, const unsigned int 
 
 }
 
-	//TODO FUNCTION COMMENT
-
+/*
+* Purpose: destroy_matrix frees the memory of the matrix and the data in the struct
+* 		   of the matrix
+* Input: This function gets passed the matrix struct pointer
+* Return: Nothing is returned, but the result is freed memory where the matricies were
+* 		  previously allocated
+*/
 void destroy_matrix (Matrix_t** m) {
 
-	//TODO ERROR CHECK INCOMING PARAMETERS
+	if(!(*m)) {
+		return;
+	}
 	
 	free((*m)->data);
 	free(*m);
@@ -66,11 +82,16 @@ void destroy_matrix (Matrix_t** m) {
 }
 
 
-	
-	//TODO FUNCTION COMMENT
+/*
+* Purpose: This function compares 2 matrices for equality
+* Input: equal_matrices takes in the pointer of two matrices
+* Return: Returns True if matrices are equal, otherwise false
+*/
 bool equal_matrices (Matrix_t* a, Matrix_t* b) {
-
-	//TODO ERROR CHECK INCOMING PARAMETERS
+	
+	if(!a || !b) {
+		return false;
+	}
 	
 	if (!a || !b || !a->data || !b->data) {
 		return false;	
@@ -83,11 +104,13 @@ bool equal_matrices (Matrix_t* a, Matrix_t* b) {
 	return false;
 }
 
-	//TODO FUNCTION COMMENT
+/*
+* Purpose: duplicate_matrix makes another copy of a matrix that is already created
+* Input: This function takes in the source and destination pointers (dest ptr is NULL)
+* 		 of the current matrix and the new matrix to become a copy of the source matrix
+* Return: It returns the source and destination pointers
+*/
 bool duplicate_matrix (Matrix_t* src, Matrix_t* dest) {
-
-
-	//TODO ERROR CHECK INCOMING PARAMETERS
 
 	if (!src) {
 		return false;
@@ -96,15 +119,23 @@ bool duplicate_matrix (Matrix_t* src, Matrix_t* dest) {
 	 * copy over data
 	 */
 	unsigned int bytesToCopy = sizeof(unsigned int) * src->rows * src->cols;
-	memcpy(src->data,dest->data, bytesToCopy);	
+	memcpy(dest->data, src->data, bytesToCopy);	
 	return equal_matrices (src,dest);
 }
 
-	//TODO FUNCTION COMMENT
+/*
+* Purpose: The bitwise_shift_matrix function shifts the bits of each integer in
+* 		   a given matrix to the power of the integer input by the user. So a left
+* 		   shift of 3 would multiply each integer of the matrix by 2^3 and vice versa.
+* Input: This function takes in the pointer to the matrix being operated on, the direction
+* 		 (either left or right), and an integer value for the number of positions the 
+* 		 bits are going to move.
+* Return: This returns true if the operation i successful or false if an error occured.
+* 		  The function results in an updated matrix based on the bit operation.
+*/
 bool bitwise_shift_matrix (Matrix_t* a, char direction, unsigned int shift) {
-	
-	//TODO ERROR CHECK INCOMING PARAMETERS
-	if (!a) {
+
+	if (!a || !isalpha(direction) || (shift < 0)) {
 		return false;
 	}
 
@@ -112,7 +143,7 @@ bool bitwise_shift_matrix (Matrix_t* a, char direction, unsigned int shift) {
 		unsigned int i = 0;
 		for (; i < a->rows; ++i) {
 			unsigned int j = 0;
-			for (; j < a->rows; ++j) {
+			for (; j < a->cols; ++j) {
 				a->data[i * a->cols + j] = a->data[i * a->cols + j] << shift;
 			}
 		}
@@ -131,10 +162,18 @@ bool bitwise_shift_matrix (Matrix_t* a, char direction, unsigned int shift) {
 	return true;
 }
 
-	//TODO FUNCTION COMMENT
+/*
+* Purpose: This function adds two matrices together as long as they have the
+* 		   same dimmensions and creates a new matrix with the result.
+* Input: add_matrices takes in 3 matrix pointers, c being a NULL pointer, a & b
+* 		 are pointers to the two matrices being added together.
+* Return: The function returns true upon success and false upon failure.
+*/
 bool add_matrices (Matrix_t* a, Matrix_t* b, Matrix_t* c) {
 
-	//TODO ERROR CHECK INCOMING PARAMETERS
+	if(!a || !b) {
+		return false;
+	}
 
 	if (a->rows != b->rows && a->cols != b->cols) {
 		return false;
@@ -148,11 +187,17 @@ bool add_matrices (Matrix_t* a, Matrix_t* b, Matrix_t* c) {
 	return true;
 }
 
-	//TODO FUNCTION COMMENT
+/*
+* Purpose: display_matrix prints our the matrix given by the user
+* Input: The function takes in the pointer to the given matrix
+* Return: This function does not return anything but prints out the matrix in
+* 		  terminal
+*/
 void display_matrix (Matrix_t* m) {
 	
-	//TODO ERROR CHECK INCOMING PARAMETERS
-
+	if(!m) {
+		return;
+	}
 
 	printf("\nMatrix Contents (%s):\n", m->name);
 	printf("DIM = (%u,%u)\n", m->rows, m->cols);
@@ -166,11 +211,16 @@ void display_matrix (Matrix_t* m) {
 
 }
 
-	//TODO FUNCTION COMMENT
+/*
+* Purpose: read_matrix reads in a matrix binary file from the file system
+* Input: takes in the file name and the matrix structure
+* Return: Returns false upon failure and true upon success
+*/
 bool read_matrix (const char* matrix_input_filename, Matrix_t** m) {
 	
-	//TODO ERROR CHECK INCOMING PARAMETERS
-
+	if(!matrix_input_filename) {
+		return false;
+	}
 
 	int fd = open(matrix_input_filename,O_RDONLY);
 	if (fd < 0) {
@@ -282,7 +332,7 @@ bool read_matrix (const char* matrix_input_filename, Matrix_t** m) {
 		else if (errno == EEXIST) {
 			perror("FILE EXIST\n");
 		}
-
+		free(data);
 		return false;	
 	}
 
@@ -296,13 +346,20 @@ bool read_matrix (const char* matrix_input_filename, Matrix_t** m) {
 		return false;
 
 	}
+	free(data);
 	return true;
 }
 
-	//TODO FUNCTION COMMENT
+/*
+* Purpose: write_matrix writes to a matrix binary file from the file system
+* Input: takes in the file name and the matrix structure
+* Return: Returns false upon failure and true upon success
+*/
 bool write_matrix (const char* matrix_output_filename, Matrix_t* m) {
 	
-	//TODO ERROR CHECK INCOMING PARAMETERS
+	if(!m || !matrix_output_filename) {
+		return false;
+	}
 
 	int fd = open (matrix_output_filename, O_CREAT | O_RDWR | O_TRUNC, 0644);
 	/* ERROR HANDLING USING errorno*/
@@ -367,10 +424,21 @@ bool write_matrix (const char* matrix_output_filename, Matrix_t* m) {
 	return true;
 }
 
-	//TODO FUNCTION COMMENT
+/*
+* Purpose: random_matrix randomizes an already created matrix with
+* 		   random numbers. Each number in the matrix will be between
+* 		   the start range and end range. The range of the integers are also
+* 		   determined by the user 
+* Input: The inputs are the matrix pointer, the beginning index, and ending
+* 		 index of the range of integers.
+* Return: This returns true upon successful randomized matrix and false
+* 		  on failure
+*/
 bool random_matrix(Matrix_t* m, unsigned int start_range, unsigned int end_range) {
 	
-	//TODO ERROR CHECK INCOMING PARAMETERS
+	if(!m || (start_range > end_range) || (start_range < 0) || (end_range < 0)) {
+		return false;
+	}
 
 	for (unsigned int i = 0; i < m->rows; ++i) {
 		for (unsigned int j = 0; j < m->cols; ++j) {
@@ -382,17 +450,35 @@ bool random_matrix(Matrix_t* m, unsigned int start_range, unsigned int end_range
 
 /*Protected Functions in C*/
 
-	//TODO FUNCTION COMMENT
+/*
+* Purpose: load_matrix copies the matrix data into the struct of
+* 		   the given matrix
+* Input: It takes in the matrix pointer that will be the destination
+* 		 of the data
+* Return: Nothing is returned. Copying of memory is the only result
+*/
 void load_matrix (Matrix_t* m, unsigned int* data) {
 	
-	//TODO ERROR CHECK INCOMING PARAMETERS
+	if(!m || !data) {
+		return;
+	}
 	memcpy(m->data,data,m->rows * m->cols * sizeof(unsigned int));
 }
 
-	//TODO FUNCTION COMMENT
+/*
+* Purpose: add_matrix_to_array adds a new matrix to the array of matrices
+* 		   where a maximum of 10 matrices exist. Memory deallocation occurs
+* 		   when more than 10 matrices are created
+* Input: This function takes in the matrix struct pointer, the new
+* 		 matrix pointer, and the number of matrices
+* Return: It returns the posistion (or index) of the added matrix
+*/
 unsigned int add_matrix_to_array (Matrix_t** mats, Matrix_t* new_matrix, unsigned int num_mats) {
 	
-	//TODO ERROR CHECK INCOMING PARAMETERS
+	if(!new_matrix || (num_mats < 0)) {
+		return -1;
+	}
+
 	static long int current_position = 0;
 	const long int pos = current_position % num_mats;
 	if ( mats[pos] ) {

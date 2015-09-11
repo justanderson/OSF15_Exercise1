@@ -1,3 +1,9 @@
+/*
+* Exercise 1
+* Justin Anderson
+* 14136222
+* 11 Sep 15
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,11 +14,21 @@
 #define MAX_CMD_COUNT 50
 #define MAX_CMD_LEN 25
 
-
-	//TODO FUNCTION COMMENT
+/*
+* Purpose: This function is designed to allocate memory for a command entered by
+* 		   the user. It parses the user command and makes sure it is under the
+* 		   max number of commands which is 50 and less than 25 chars in length.
+* 		   If the command is valid, it is entered into the cmd struct
+* Input: parse_user_input takes in the user command as a string as well as the
+* 		 cmd struct pointer
+* Return: It returns true or false depending on if the command was successfully
+* 		  allocated or not. On success, the command is stored in the cmd struct
+*/
 bool parse_user_input (const char* input, Commands_t** cmd) {
-	
-	//TODO ERROR CHECK INCOMING PARAMETERS
+
+	if(!input) {
+		return false;
+	}
 
 	char *string = strdup(input);
 	
@@ -36,11 +52,17 @@ bool parse_user_input (const char* input, Commands_t** cmd) {
 	return true;
 }
 
-	//TODO FUNCTION COMMENT
+/*
+* Purpose: This function frees the memory that was allocated for the user commands
+* Input: destroy_commands takes in the cmd struct pointer
+* Return: The result of this function is freed memory, nothing is returned.
+*/
 void destroy_commands(Commands_t** cmd) {
 
-	//TODO ERROR CHECK INCOMING PARAMETERS
-	
+	if(!(*cmd)) {
+		return;
+	}	
+
 	for (int i = 0; i < (*cmd)->num_cmds; ++i) {
 		free((*cmd)->cmds[i]);
 	}
